@@ -68,7 +68,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/**",
                                 "/favicon.ico",
-                             "/api/v1/weather/**"
+                             "/api/v1/weather/**",
+                             "/api/translate/**",
+                                "/api/search/**"
 
                         ).permitAll()
                         // Everything else requires authentication
@@ -80,4 +82,8 @@ public class SecurityConfig {
 
         return http.build();
     }
+    
+    
+    
+    
 }
