@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransSpeak - Translation & Text-to-Speech</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .card-header h2 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #6510a5;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .result-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-box {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .performance-info {
+            background-color: #e8f4fd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .endpoint-card {
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .endpoint-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .endpoint-card p {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .json-response {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-toggle {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 20px;
+            }
+            
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                gap: 0;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .nav-links a {
+                padding: 1rem;
+                border-radius: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .endpoint-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-language"></i>
+                    <span>TransSpeak</span>
+                </div>
+                <button class="nav-toggle" id="navToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="nav-links" id="navLinks">
+                    <a href="#" class="nav-link active" data-page="home">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="translate">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Translate</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="tts">
+                        <i class="fas fa-volume-up"></i>
+                        <span>Text-to-Speech</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="combined">
+                        <i class="fas fa-bolt"></i>
+                        <span>Translate & Speak</span>
+                    </a>
+                    <a href="#" class="nav-link" data-page="api-info">
+                        <i class="fas fa-code"></i>
+                        <span>API Info</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-language"></i> Welcome to TransSpeak</h2>
+                </div>
+                <p>TransSpeak is an advanced translation and text-to-speech service for Bemba and English languages.</p>
+                
+                <div class="btn-group" style="margin-top: 2rem;">
+                    <button class="btn" data-page="translate">
+                        <i class="fas fa-exchange-alt"></i>
+                        Start Translating
+                    </button>
+                    <button class="btn btn-secondary" data-page="tts">
+                        <i class="fas fa-volume-up"></i>
+                        Try Text-to-Speech
+                    </button>
+                    <button class="btn btn-outline" data-page="api-info">
+                        <i class="fas fa-code"></i>
+                        View API Documentation
+                    </button>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3>Features</h3>
+                    <div class="endpoint-info">
+                        <div class="endpoint-card">
+                            <h3><i class="fas fa-exchange-alt"></i> Fast Translation</h3>
+                            <p>Translate between English and Bemba with high accuracy</p>
+                        </div>
+                        <div class="endpoint-card">
+                            <h3><i class="fas fa-volume-up"></i> High-Quality TTS</h3>
+                            <p>Convert text to natural-sounding speech in Bemba</p>
+                        </div>
+                        <div class="endpoint-card">
+                            <h3><i class="fas fa-bolt"></i> Optimized Performance</h3>
+                            <p>Parallel processing for faster combined translation and TTS</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Translation Page -->
+        <section id="translate" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-exchange-alt"></i> Translation</h2>
+                    <p>Translate text between English and Bemba</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sourceLang">Source Language</label>
+                    <select id="sourceLang">
+                        <option value="English">English</option>
+                        <option value="Bemba">Bemba</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="targetLang">Target Language</label>
+                    <select id="targetLang">
+                        <option value="Bemba">Bemba</option>
+                        <option value="English">English</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="translateText">Text to Translate</label>
+                    <textarea id="translateText" placeholder="Enter text to translate..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="translateBtn" class="btn">
+                        <i class="fas fa-exchange-alt"></i>
+                        Translate
+                    </button>
+                </div>
+                
+                <div id="translateResult" class="result-container">
+                    <div class="result-box">
+                        <div class="result-header">
+                            <div class="result-title">Translation Result</div>
+                        </div>
+                        <div id="translatedText"></div>
+                        <div class="performance-info" id="translatePerformance"></div>
+                    </div>
+                </div>
+                
+                <div id="translateLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Translating...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Text-to-Speech Page -->
+        <section id="tts" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-volume-up"></i> Text-to-Speech</h2>
+                    <p>Convert text to speech in Bemba</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ttsText">Text to Convert to Speech</label>
+                    <textarea id="ttsText" placeholder="Enter text to convert to speech..."></textarea>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="ttsBtn" class="btn">
+                        <i class="fas fa-volume-up"></i>
+                        Generate Speech
+                    </button>
+                    <button id="ttsBase64Btn" class="btn btn-secondary">
+                        <i class="fas fa-file-code"></i>
+                        Generate Speech (Base64)
+                    </button>
+                </div>
+                
+                <div id="ttsResult" class="result-container">
+                    <div class="result-box">
+                        <div class="result-header">
+                            <div class="result-title">Speech Generated</div>
+                        </div>
+                        <audio id="ttsAudio" controls class="audio-player"></audio>
+                        <div class="performance-info" id="ttsPerformance"></div>
+                    </div>
+                </div>
+                
+                <div id="ttsLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating speech...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Combined Translation & TTS Page -->
+        <section id="combined" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-bolt"></i> Translate & Speak</h2>
+                    <p>Translate text and generate speech in one request</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="combinedSourceLang">Source Language</label>
+                    <select id="combinedSourceLang">
+                        <option value="English">English</option>
+                        <option value="Bemba">Bemba</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="combinedTargetLang">Target Language</label>
+                    <select id="combinedTargetLang">
+                        <option value="Bemba">Bemba</option>
+                        <option value="English">English</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="combinedText">Text to Translate and Speak</label>
+                    <textarea id="combinedText" placeholder="Enter text to translate and convert to speech..."></textarea>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="generateAudio" checked>
+                    <label for="generateAudio">Generate audio</label>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="combinedBtn" class="btn">
+                        <i class="fas fa-bolt"></i>
+                        Translate & Speak
+                    </button>
+                    <button id="parallelBtn" class="btn btn-secondary">
+                        <i class="fas fa-rocket"></i>
+                        Advanced Parallel Processing
+                    </button>
+                </div>
+                
+                <div id="combinedResult" class="result-container">
+                    <div class="result-box">
+                        <div class="result-header">
+                            <div class="result-title">Translation Result</div>
+                        </div>
+                        <div id="combinedTranslatedText"></div>
+                        <div class="performance-info" id="combinedPerformance"></div>
+                    </div>
+                    
+                    <div id="combinedAudioResult" class="result-box">
+                        <div class="result-header">
+                            <div class="result-title">Generated Speech</div>
+                        </div>
+                        <audio id="combinedAudio" controls class="audio-player"></audio>
+                        <div class="performance-info" id="combinedAudioPerformance"></div>
+                    </div>
+                </div>
+                
+                <div id="combinedLoading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Translating and generating speech...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Information Page -->
+        <section id="api-info" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-code"></i> API Information</h2>
+                    <p>Available endpoints and their usage</p>
+                </div>
+                
+                <div class="endpoint-info">
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">POST</span>
+                        <h3>/translate</h3>
+                        <p>Translate text between English and Bemba</p>
+                        <div class="json-response">
+                            <strong>Response:</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"originalText": "Hello",<br>
+                            &nbsp;&nbsp;"sourceLang": "English",<br>
+                            &nbsp;&nbsp;"targetLang": "Bemba",<br>
+                            &nbsp;&nbsp;"translation": "Muli shani",<br>
+                            &nbsp;&nbsp;"processingTime": "1.23s"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">POST</span>
+                        <h3>/tts</h3>
+                        <p>Convert text to speech (returns WAV file)</p>
+                        <div class="json-response">
+                            <strong>Returns:</strong><br>
+                            Audio WAV file for direct playback
+                        </div>
+                    </div>
+                    
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">POST</span>
+                        <h3>/tts-base64</h3>
+                        <p>Convert text to speech (returns base64 JSON)</p>
+                        <div class="json-response">
+                            <strong>Response:</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"text": "Muli shani",<br>
+                            &nbsp;&nbsp;"audio": "base64encodedstring...",<br>
+                            &nbsp;&nbsp;"audioFormat": "audio/wav",<br>
+                            &nbsp;&nbsp;"sampleRate": 24000,<br>
+                            &nbsp;&nbsp;"generationTime": "1.45s"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">POST</span>
+                        <h3>/translate-and-speak</h3>
+                        <p>Optimized combined translation + TTS</p>
+                        <div class="json-response">
+                            <strong>Response:</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"originalText": "Hello",<br>
+                            &nbsp;&nbsp;"sourceLang": "English",<br>
+                            &nbsp;&nbsp;"targetLang": "Bemba",<br>
+                            &nbsp;&nbsp;"translatedText": "Muli shani",<br>
+                            &nbsp;&nbsp;"translationTime": "1.23s",<br>
+                            &nbsp;&nbsp;"audioAvailable": true,<br>
+                            &nbsp;&nbsp;"audio": "base64encodedstring...",<br>
+                            &nbsp;&nbsp;"totalTime": "2.68s"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">POST</span>
+                        <h3>/translate-and-speak-parallel</h3>
+                        <p>Advanced parallel processing for maximum performance</p>
+                        <div class="json-response">
+                            <strong>Response:</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"originalText": "Hello",<br>
+                            &nbsp;&nbsp;"sourceLang": "English",<br>
+                            &nbsp;&nbsp;"targetLang": "Bemba",<br>
+                            &nbsp;&nbsp;"translatedText": "Muli shani",<br>
+                            &nbsp;&nbsp;"translationTime": "1.15s",<br>
+                            &nbsp;&nbsp;"performance": "advanced_parallel",<br>
+                            &nbsp;&nbsp;"audioAvailable": true,<br>
+                            &nbsp;&nbsp;"audio": "base64encodedstring...",<br>
+                            &nbsp;&nbsp;"totalTime": "1.89s"<br>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="endpoint-card">
+                        <span class="endpoint-method">GET</span>
+                        <h3>/health</h3>
+                        <p>Service health check</p>
+                        <div class="json-response">
+                            <strong>Response:</strong><br>
+                            {<br>
+                            &nbsp;&nbsp;"status": "healthy",<br>
+                            &nbsp;&nbsp;"service": "TransSpeak Translation & TTS",<br>
+                            &nbsp;&nbsp;"performance": "optimized_parallel"<br>
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group" style="margin-top: 1.5rem;">
+                    <button id="healthCheckBtn" class="btn btn-outline">
+                        <i class="fas fa-heartbeat"></i>
+                        Check API Health
+                    </button>
+                    <button id="performanceInfoBtn" class="btn btn-outline">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Performance Info
+                    </button>
+                </div>
+                
+                <div id="apiInfoResult" class="result-container">
+                    <div class="result-box">
+                        <div class="result-header">
+                            <div class="result-title">API Response</div>
+                        </div>
+                        <pre id="apiResponse"></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TransSpeak</h3>
+                    <p>Advanced Translation & Text-to-Speech API for Bemba and English languages.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>API Base URL</h3>
+                    <p>https://api.nextinnomind.me</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <p>Fast Translation</p>
+                    <p>High-Quality TTS</p>
+                    <p>Parallel Processing</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 TransSpeak API. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'https://api.nextinnomind.me';
+        
+        // DOM Elements
+        const navToggle = document.getElementById('navToggle');
+        const navLinks = document.getElementById('navLinks');
+        const navLinkElements = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        
+        // Navigation toggle for mobile
+        navToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('show');
+        });
+        
+        // Page navigation
+        navLinkElements.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Update active nav link
+                navLinkElements.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show selected page
+                const pageId = this.getAttribute('data-page');
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === pageId) {
+                        page.classList.add('active');
+                    }
+                });
+                
+                // Close mobile menu if open
+                if (navLinks.classList.contains('show')) {
+                    navLinks.classList.remove('show');
+                }
+            });
+        });
+        
+        // Home page buttons navigation
+        document.querySelectorAll('[data-page]').forEach(button => {
+            if (button.classList.contains('btn')) {
+                button.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    
+                    // Update active nav link
+                    navLinkElements.forEach(l => l.classList.remove('active'));
+                    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+                    
+                    // Show selected page
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                        if (page.id === pageId) {
+                            page.classList.add('active');
+                        }
+                    });
+                });
+            }
+        });
+        
+        // Translation function
+        document.getElementById('translateBtn').addEventListener('click', async () => {
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+            const text = document.getElementById('translateText').value.trim();
+            
+            if (!text) {
+                alert('Please enter text to translate');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('translateLoading').classList.add('show');
+            document.getElementById('translateResult').classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/translate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('translatedText').textContent = data.translation;
+                    document.getElementById('translatePerformance').textContent = `Translation completed in ${data.processingTime}`;
+                    document.getElementById('translateResult').classList.add('show');
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Translation error:', error);
+                alert('Failed to translate text. Please try again.');
+            } finally {
+                document.getElementById('translateLoading').classList.remove('show');
+            }
+        });
+        
+        // TTS function (WAV file)
+        document.getElementById('ttsBtn').addEventListener('click', async () => {
+            const text = document.getElementById('ttsText').value.trim();
+            
+            if (!text) {
+                alert('Please enter text to convert to speech');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('ttsLoading').classList.add('show');
+            document.getElementById('ttsResult').classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/tts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text
+                    })
+                });
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById('ttsAudio').src = audioUrl;
+                    document.getElementById('ttsPerformance').textContent = 'Audio generated successfully';
+                    document.getElementById('ttsResult').classList.add('show');
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.error}`);
+                }
+            } catch (error) {
+                console.error('TTS error:', error);
+                alert('Failed to generate speech. Please try again.');
+            } finally {
+                document.getElementById('ttsLoading').classList.remove('show');
+            }
+        });
+        
+        // TTS function (Base64)
+        document.getElementById('ttsBase64Btn').addEventListener('click', async () => {
+            const text = document.getElementById('ttsText').value.trim();
+            
+            if (!text) {
+                alert('Please enter text to convert to speech');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('ttsLoading').classList.add('show');
+            document.getElementById('ttsResult').classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/tts-base64`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Create audio from base64
+                    const audioBlob = base64ToBlob(data.audio, 'audio/wav');
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    document.getElementById('ttsAudio').src = audioUrl;
+                    document.getElementById('ttsPerformance').textContent = `Audio generated in ${data.generationTime}`;
+                    document.getElementById('ttsResult').classList.add('show');
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('TTS Base64 error:', error);
+                alert('Failed to generate speech. Please try again.');
+            } finally {
+                document.getElementById('ttsLoading').classList.remove('show');
+            }
+        });
+        
+        // Combined Translate & Speak function
+        document.getElementById('combinedBtn').addEventListener('click', async () => {
+            const sourceLang = document.getElementById('combinedSourceLang').value;
+            const targetLang = document.getElementById('combinedTargetLang').value;
+            const text = document.getElementById('combinedText').value.trim();
+            const generateAudio = document.getElementById('generateAudio').checked;
+            
+            if (!text) {
+                alert('Please enter text to translate and speak');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('combinedLoading').classList.add('show');
+            document.getElementById('combinedResult').classList.remove('show');
+            document.getElementById('combinedAudioResult').style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/translate-and-speak`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        generateAudio: generateAudio
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('combinedTranslatedText').textContent = data.translatedText;
+                    document.getElementById('combinedPerformance').textContent = `Translation completed in ${data.translationTime}, Total time: ${data.totalTime}`;
+                    
+                    if (data.audioAvailable) {
+                        const audioBlob = base64ToBlob(data.audio, 'audio/wav');
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        document.getElementById('combinedAudio').src = audioUrl;
+                        document.getElementById('combinedAudioPerformance').textContent = `Audio generated in ${data.audioTime}`;
+                        document.getElementById('combinedAudioResult').style.display = 'block';
+                    }
+                    
+                    document.getElementById('combinedResult').classList.add('show');
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Combined translation error:', error);
+                alert('Failed to translate and generate speech. Please try again.');
+            } finally {
+                document.getElementById('combinedLoading').classList.remove('show');
+            }
+        });
+        
+        // Advanced Parallel Processing function
+        document.getElementById('parallelBtn').addEventListener('click', async () => {
+            const sourceLang = document.getElementById('combinedSourceLang').value;
+            const targetLang = document.getElementById('combinedTargetLang').value;
+            const text = document.getElementById('combinedText').value.trim();
+            const generateAudio = document.getElementById('generateAudio').checked;
+            
+            if (!text) {
+                alert('Please enter text to translate and speak');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('combinedLoading').classList.add('show');
+            document.getElementById('combinedResult').classList.remove('show');
+            document.getElementById('combinedAudioResult').style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/translate-and-speak-parallel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        generateAudio: generateAudio
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('combinedTranslatedText').textContent = data.translatedText;
+                    document.getElementById('combinedPerformance').textContent = `Translation completed in ${data.translationTime}, Total time: ${data.totalTime} (${data.performance})`;
+                    
+                    if (data.audioAvailable) {
+                        const audioBlob = base64ToBlob(data.audio, 'audio/wav');
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        document.getElementById('combinedAudio').src = audioUrl;
+                        document.getElementById('combinedAudioPerformance').textContent = `Audio generated in ${data.audioTime}`;
+                        document.getElementById('combinedAudioResult').style.display = 'block';
+                    }
+                    
+                    document.getElementById('combinedResult').classList.add('show');
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Parallel processing error:', error);
+                alert('Failed to translate and generate speech. Please try again.');
+            } finally {
+                document.getElementById('combinedLoading').classList.remove('show');
+            }
+        });
+        
+        // Health Check function
+        document.getElementById('healthCheckBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('apiInfoResult').classList.add('show');
+            } catch (error) {
+                console.error('Health check error:', error);
+                alert('Failed to check API health');
+            }
+        });
+        
+        // Performance Info function
+        document.getElementById('performanceInfoBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/performance`);
+                const data = await response.json();
+                
+                document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('apiInfoResult').classList.add('show');
+            } catch (error) {
+                console.error('Performance info error:', error);
+                alert('Failed to get performance information');
+            }
+        });
+        
+        // Helper function to convert base64 to blob
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64);
+            const byteArrays = [];
+            
+            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                const slice = byteCharacters.slice(offset, offset + 512);
+                
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+            
+            return new Blob(byteArrays, { type: mimeType });
+        }
+    </script>
+</body>
+</html>
