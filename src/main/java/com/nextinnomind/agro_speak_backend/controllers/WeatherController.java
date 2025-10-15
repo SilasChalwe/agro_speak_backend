@@ -2,6 +2,9 @@ package com.nextinnomind.agro_speak_backend.controllers;
 
 import com.nextinnomind.agro_speak_backend.entity.WeatherResponse;
 import com.nextinnomind.agro_speak_backend.service.WeatherService;
+import com.nextinnomind.agro_speak_backend.service.SmsService;
+import com.nextinnomind.agro_speak_backend.repository.UserRepository;
+import com.nextinnomind.agro_speak_backend.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,8 @@ import java.util.Map;
 public class WeatherController {
 
     private final WeatherService weatherService;
+    private final SmsService smsService;
+    private final UserRepository userRepository;
 
     /**
      * Get current weather conditions
@@ -44,6 +49,75 @@ public class WeatherController {
                      latitude, longitude, clientIp, e.getMessage(), e);
             return ResponseEntity.internalServerError()
                     .body(createErrorResponse("Failed to fetch current weather data"));
+        }
+    }
+
+    /**
+     * Send forecast via SMS to a phone number (ad-hoc)
+     */
+    @PostMapping("/sms/forecast")
+    public ResponseEntity<?> sendForecastSms(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam String phone,
+            HttpServletRequest request) {
+
+        String clientIp = getClientIpAddress(request);
+        log.info("=== SMS FORECAST REQUESTED ===");
+        log.info("Method: POST | Endpoint: /api/v1/weather/sms/forecast | IP: {} | User-Agent: {}", 
+                 clientIp, request.getHeader("User-Agent"));
+
+        try {
+            WeatherResponse resp = weatherService.getDailyForecast(latitude, longitude, 3);
+            StringBuilder body = new StringBuilder();
+            body.append("3-day forecast:\n");
+            if (resp != null && resp.getDaily() != null) {
+                String[] times = resp.getDaily().getTime();
+                double[] tmax = resp.getDaily().getTemperatureMax();
+                double[] tmin = resp.getDaily().getTemperatureMin();
+                String[] messages = resp.getDaily().getMessages();
+                int n = Math.min(times.length, Math.min(tmax.length, tmin.length));
+                for (int i = 0; i < n; i++) {
+                    body.append(times[i]).append(": ")
+                        .append(messages != null && messages.length > i ? messages[i] : "")
+                        .append(" - ").append(tmin[i]).append("/" ).append(tmax[i]).append(" C\n");
+                }
+            } else {
+                body.append("Forecast not available.");
+            }
+
+            boolean sent = smsService.sendSms(phone, body.toString());
+            if (sent) return ResponseEntity.ok().body(Map.of("message", "SMS sent"));
+            return ResponseEntity.status(503).body(createErrorResponse("SMS sending failed or not configured"));
+
+        } catch (Exception e) {
+            log.error("Error sending SMS forecast to {} from IP {}: {}", phone, clientIp, e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(createErrorResponse("Failed to send SMS forecast"));
+        }
+    }
+
+    /**
+     * Subscribe or unsubscribe the authenticated user's phone for proactive alerts
+     */
+    @PostMapping("/alerts/subscribe")
+    public ResponseEntity<?> subscribeAlerts(@RequestParam Long userId,
+                                             @RequestParam boolean enable,
+                                             @RequestParam(required = false) Double latitude,
+                                             @RequestParam(required = false) Double longitude) {
+        try {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) return ResponseEntity.status(404).body(createErrorResponse("User not found"));
+
+            user.setAlertsEnabled(enable);
+            if (latitude != null && longitude != null) {
+                user.setLatitude(latitude);
+                user.setLongitude(longitude);
+            }
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("message", "Subscription updated", "alertsEnabled", enable));
+        } catch (Exception e) {
+            log.error("Failed to update subscription: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(createErrorResponse("Failed to update subscription"));
         }
     }
 
