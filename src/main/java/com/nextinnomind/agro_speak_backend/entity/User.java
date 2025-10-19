@@ -26,6 +26,11 @@ public class User {
     private String password;
 
     private String phone;
+    private Boolean alertsEnabled = false;
+
+    // Optional preferred location for weather alerts (falls back to provided coordinates in requests)
+    private Double latitude;
+    private Double longitude;
     
     private String avatarUrl;
 
