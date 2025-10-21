@@ -14,6 +14,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+
 import java.util.Arrays;
 
 @Configuration
@@ -23,67 +24,75 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationEntryPoint unauthorizedHandler;
 
+    // Password encoder bean
     @Bean
-
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Authentication manager bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // Security filter chain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Disable CSRF for API as we're using JWT tokens
-                .cors(cors -> cors
-                    .configurationSource(request -> {
-                        CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOriginPatterns(Arrays.asList(
-                            "http://localhost:3000",    // React development
-                            "http://localhost:4200",    // Angular development  
-                            "http://localhost:8080",    // Vue.js development
-                            "https://yourdomain.com",   // Production domain
-                            "https://*.yourdomain.com"  // Subdomains
-                        ));
-                        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"));
-                        config.setAllowedHeaders(Arrays.asList("*"));
-                        config.setAllowCredentials(true);
-                        config.setMaxAge(3600L);
-                        return config;
-                    })
-                )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers(
-                                "/api/v1/auth/**",
-                                "/auth/**",
-                                "/api/v1/public/**",
-                                "/api/v1/security/**",  // Add security endpoints as public
-                                "/ws/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/actuator/**",
-                                "/favicon.ico",
-                             "/api/v1/weather/**",
-                             "/api/translate/**",
-                                "/api/search/**"
+        http
+            // Disable CSRF (we use JWT)
+            .csrf(csrf -> csrf.disable())
 
-                        ).permitAll()
-                        // Everything else requires authentication
-                        .anyRequest().authenticated()
-                );
+            // Enable CORS with your custom configuration
+            .cors(cors -> cors.configurationSource(request -> {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOriginPatterns(Arrays.asList(
+                        "http://localhost:3000",    // React dev
+                        "http://localhost:4200",    // Angular dev
+                        "http://localhost:8080",    // Vue dev
+                        "https://yourdomain.com",   // Production
+                        "https://*.yourdomain.com"  // Subdomains
+                ));
+                config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                config.setAllowedHeaders(Arrays.asList("*"));
+                config.setAllowCredentials(true);
+                config.setMaxAge(3600L);
+                return config;
+            }))
 
-        // Add JWT filter before Spring Security’s username/password filter
+            // Exception handling for unauthorized access
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
+
+            // Stateless session (no session cookies)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+            // Authorization rules
+            .authorizeHttpRequests(auth -> auth
+                // Public endpoints
+                .requestMatchers(
+                        "/api/v1/auth/**",
+                        "/auth/**",
+                        "/api/v1/public/**",
+                        "/api/v1/security/**",
+                        "/api/v1/weather/**",
+                        "/api/translate/**",
+                        "/api/search/**",
+                        "/ws/**",
+                        // Swagger and API docs
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/actuator/**",
+                        "/favicon.ico"
+                ).permitAll()
+
+                // All other requests must be authenticated
+                .anyRequest().authenticated()
+            );
+
+        // Add JWT filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-    
-    
-    
-    
 }
