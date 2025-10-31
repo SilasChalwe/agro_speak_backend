@@ -1,1 +1,3 @@
 venv/
+translator_app/generated_audio/
+translator_app/nohup.out
