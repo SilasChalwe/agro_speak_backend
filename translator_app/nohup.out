@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/agro_speak_backend/translator_app/app.py", line 3, in <module>
+    from transformers import pipeline
+ModuleNotFoundError: No module named 'transformers'
+Loaded as API: https://victorsconcious-bemba-english-translator.hf.space ✔
+ * Serving Flask app 'translator'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://110.107.1.142:5000
+[33mPress CTRL+C to quit[0m
+Loaded as API: https://victorsconcious-bemba-narrator.hf.space ✔
+ * Serving Flask app 'speak'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://110.107.1.142:5001
+[33mPress CTRL+C to quit[0m
+Loaded as API: https://asr-africa-asr-african-languages.hf.space ✔
+ * Serving Flask app 'trans'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://110.107.1.142:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 128-104-211
+ * Detected change in '/data/data/com.termux/files/home/agro_speak_backend/translator_app/app.py', reloading
+Loaded as API: https://asr-africa-asr-african-languages.hf.space ✔
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 637-584-246
+ * Detected change in '/data/data/com.termux/files/home/agro_speak_backend/translator_app/app.py', reloading
+Loaded as API: https://asr-africa-asr-african-languages.hf.space ✔
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 978-032-675
+ * Detected change in '/data/data/com.termux/files/home/agro_speak_backend/translator_app/app.py', reloading
+Loaded as API: https://asr-africa-asr-african-languages.hf.space ✔
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 672-658-420
