@@ -81,6 +81,7 @@ public class TranslationService {
         requestBody.put("messages", List.of(message));
 
         try {
+            @SuppressWarnings("null")
             OpenRouterResponse response = webClient.post()
                     .uri(baseUrl)
                     .header("Authorization", "Bearer " + openRouterApiKey)

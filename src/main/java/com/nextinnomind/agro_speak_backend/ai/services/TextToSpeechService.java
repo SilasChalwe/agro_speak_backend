@@ -26,11 +26,14 @@ public class TextToSpeechService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             var request = new HttpEntity<>(payload, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>)(ResponseEntity<?>) 
+                    restTemplate.postForEntity(url, request, Map.class);
             Map<String, Object> data = response.getBody();
 
             if (data == null || data.containsKey("error")) {
-                return new AIResponse<>(false, (String) data.getOrDefault("error", "TTS failed"), null);
+                String errorMsg = data != null ? (String) data.getOrDefault("error", "TTS failed") : "TTS failed";
+                return new AIResponse<>(false, errorMsg, null);
             }
 
             SpeechSynthesisResult result = new SpeechSynthesisResult(

@@ -38,11 +38,14 @@ public class SpeechToTextService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             var request = new HttpEntity<>(body, headers);
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
+            @SuppressWarnings({"unchecked", "null"})
+            ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>)(ResponseEntity<?>) 
+                    restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
             Map<String, Object> data = response.getBody();
 
             if (data == null || data.containsKey("error")) {
-                return new AIResponse<>(false, (String) data.getOrDefault("error", "Unknown error"), null);
+                String errorMsg = data != null ? (String) data.getOrDefault("error", "Unknown error") : "Unknown error";
+                return new AIResponse<>(false, errorMsg, null);
             }
 
             TranscriptionResult result = new TranscriptionResult(

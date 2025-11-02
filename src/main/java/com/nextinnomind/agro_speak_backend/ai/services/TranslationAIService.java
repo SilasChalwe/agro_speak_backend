@@ -21,21 +21,24 @@ public class TranslationAIService {
         String url = flaskApiBase + "/api/translate";
 
         try {
-            var payload = Map.of(
+            Map<String, Object> payload = Map.of(
                 "text", text,
                 "sourceLang", sourceLang,
                 "targetLang", targetLang
             );
 
-            var headers = new HttpHeaders();
+            HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            var request = new HttpEntity<>(payload, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+            @SuppressWarnings("unchecked")
+            ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>)(ResponseEntity<?>) 
+                    restTemplate.postForEntity(url, request, Map.class);
             Map<String, Object> data = response.getBody();
 
             if (data == null || data.containsKey("error")) {
-                return new AIResponse<>(false, (String) data.getOrDefault("error", "Translation failed"), null);
+                String errorMsg = data != null ? (String) data.getOrDefault("error", "Translation failed") : "Translation failed";
+                return new AIResponse<>(false, errorMsg, null);
             }
 
             TranslationResult result = new TranslationResult(

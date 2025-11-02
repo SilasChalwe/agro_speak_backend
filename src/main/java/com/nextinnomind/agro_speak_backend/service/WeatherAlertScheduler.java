@@ -66,7 +66,21 @@ public class WeatherAlertScheduler {
                 if (current == null || current.getCurrentWeather() == null) continue;
 
                 int code = current.getCurrentWeather().getWeathercode();
-                Double precipitation = null; // can be added by calling hourly/daily if needed
+                
+                // Get next 24 hours forecast for precipitation check
+                WeatherResponse hourlyForecast = weatherService.getHourlyForecast(lat, lon, 24);
+                Double maxPrecipitation = null;
+                
+                if (hourlyForecast != null && hourlyForecast.getHourly() != null 
+                    && hourlyForecast.getHourly().getPrecipitation() != null) {
+                    // Find maximum precipitation in next 24 hours
+                    @SuppressWarnings("null")
+                    Double maxPrecip = Arrays.stream(hourlyForecast.getHourly().getPrecipitation())
+                            .filter(p -> p != null)
+                            .max(Double::compare)
+                            .orElse(null);
+                    maxPrecipitation = maxPrecip;
+                }
 
                 StringBuilder alertBuilder = new StringBuilder();
                 boolean shouldAlert = false;
@@ -79,9 +93,12 @@ public class WeatherAlertScheduler {
                     shouldAlert = true;
                 }
 
-                if (precipitation != null && precipitation >= precipitationThreshold) {
-                    alertBuilder.append(" Heavy precipitation expected: ")
-                            .append(precipitation).append("mm.");
+                if (maxPrecipitation != null && maxPrecipitation >= precipitationThreshold) {
+                    if (shouldAlert) {
+                        alertBuilder.append(" ");
+                    }
+                    alertBuilder.append("Heavy precipitation expected: ")
+                            .append(String.format("%.1f", maxPrecipitation)).append("mm.");
                     shouldAlert = true;
                 }
 

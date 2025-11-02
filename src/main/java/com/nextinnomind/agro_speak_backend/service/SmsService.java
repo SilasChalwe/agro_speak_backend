@@ -41,7 +41,10 @@ public class SmsService {
             String url = String.format("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", accountSid);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.setBasicAuth(accountSid, authToken);
+            // Suppress null warnings - credentials already validated in configured() check
+            if (accountSid != null && authToken != null) {
+                headers.setBasicAuth(accountSid, authToken);
+            }
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
             MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
@@ -51,6 +54,7 @@ public class SmsService {
 
             HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(form, headers);
 
+            @SuppressWarnings("null")
             ResponseEntity<String> resp = restTemplate.postForEntity(url, request, String.class);
             if (resp.getStatusCode().is2xxSuccessful()) {
                 log.info("SMS sent to {}", to);

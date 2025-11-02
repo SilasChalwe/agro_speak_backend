@@ -105,6 +105,7 @@ public class WeatherController {
                                              @RequestParam(required = false) Double latitude,
                                              @RequestParam(required = false) Double longitude) {
         try {
+            @SuppressWarnings("null")
             User user = userRepository.findById(userId).orElse(null);
             if (user == null) return ResponseEntity.status(404).body(createErrorResponse("User not found"));
 

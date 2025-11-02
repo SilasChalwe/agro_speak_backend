@@ -21,7 +21,8 @@ public class WebConfig implements WebMvcConfigurer {
     private static final String UPLOAD_DIR = "uploads/";
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    @SuppressWarnings("null")
+    public void addInterceptors(@org.springframework.lang.NonNull InterceptorRegistry registry) {
         // Add request logging interceptor for all endpoints
         registry.addInterceptor(requestLoggingInterceptor)
                 .addPathPatterns("/**")
@@ -34,7 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
         // Create uploads directory if it doesn't exist
         try {
             Path uploadPath = Paths.get(UPLOAD_DIR);

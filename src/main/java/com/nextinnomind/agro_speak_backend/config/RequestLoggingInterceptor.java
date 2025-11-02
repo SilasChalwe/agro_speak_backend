@@ -14,7 +14,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class RequestLoggingInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(@org.springframework.lang.NonNull HttpServletRequest request, 
+                            @org.springframework.lang.NonNull HttpServletResponse response, 
+                            @org.springframework.lang.NonNull Object handler) {
         String method = request.getMethod();
         String uri = request.getRequestURI();
         String queryString = request.getQueryString();
@@ -49,8 +51,10 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, 
-                               Object handler, Exception ex) {
+    public void afterCompletion(@org.springframework.lang.NonNull HttpServletRequest request, 
+                               @org.springframework.lang.NonNull HttpServletResponse response, 
+                               @org.springframework.lang.NonNull Object handler, 
+                               @org.springframework.lang.Nullable Exception ex) {
         Long startTime = (Long) request.getAttribute("startTime");
         long duration = startTime != null ? System.currentTimeMillis() - startTime : 0;
         

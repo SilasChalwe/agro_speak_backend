@@ -23,7 +23,7 @@ public class CsrfConfig {
         repository.setCookieName("XSRF-TOKEN");
         repository.setHeaderName("X-XSRF-TOKEN");
         repository.setCookiePath("/");
-        repository.setCookieHttpOnly(false); // Allow JavaScript to read the cookie
+        // Cookie HttpOnly is already set to false by withHttpOnlyFalse()
         return repository;
     }
 }

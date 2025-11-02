@@ -2,12 +2,14 @@ package com.nextinnomind.agro_speak_backend.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -48,8 +50,9 @@ public class JwtUtil {
             System.out.println("JWT unsupported: " + e.getMessage());
         } catch (MalformedJwtException e) {
             System.out.println("JWT malformed: " + e.getMessage());
-        } catch (SignatureException e) {
-            System.out.println("Invalid signature: " + e.getMessage());
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+            return false;
         } catch (IllegalArgumentException e) {
             System.out.println("JWT claims string empty: " + e.getMessage());
         }

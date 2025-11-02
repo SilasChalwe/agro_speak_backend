@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -171,6 +169,7 @@ public class UserController {
             }
 
             // Save updated user
+            @SuppressWarnings("null")
             User savedUser = userRepository.save(user);
             log.info("Profile successfully updated for user: {} (ID: {})", savedUser.getEmail(), savedUser.getId());
 

@@ -44,10 +44,10 @@ public class WeatherService {
     public WeatherResponse getCurrentWeather(double latitude, double longitude) {
         log.info("Fetching current weather for coordinates: lat={}, lon={}", latitude, longitude);
         
-        String url = UriComponentsBuilder.fromHttpUrl("https://api.open-meteo.com/v1/forecast")
+        String url = UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
                 .queryParam("latitude", latitude)
                 .queryParam("longitude", longitude)
-                .queryParam("current_weather", true)
+                .queryParam("current", "temperature_2m,relative_humidity_2m,precipitation,wind_speed_10m")
                 .queryParam("timezone", "auto")
                 .toUriString();
 
@@ -76,7 +76,7 @@ public class WeatherService {
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusDays(daysAhead);
 
-        String url = UriComponentsBuilder.fromHttpUrl("https://api.open-meteo.com/v1/forecast")
+        String url = UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
                 .queryParam("latitude", latitude)
                 .queryParam("longitude", longitude)
                 .queryParam("daily", "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode")
@@ -111,16 +111,11 @@ public class WeatherService {
      */
     public WeatherResponse getHourlyForecast(double latitude, double longitude, int hoursAhead) {
         log.info("Fetching {}-hour forecast for coordinates: lat={}, lon={}", hoursAhead, latitude, longitude);
-        
-        LocalDate start = LocalDate.now();
-        LocalDate end = start.plusDays((hoursAhead / 24) + 1); // API needs dates, not hours
 
-        String url = UriComponentsBuilder.fromHttpUrl("https://api.open-meteo.com/v1/forecast")
+        String url = UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
                 .queryParam("latitude", latitude)
                 .queryParam("longitude", longitude)
-                .queryParam("hourly", "temperature_2m,weathercode")
-                .queryParam("start_date", start)
-                .queryParam("end_date", end)
+                .queryParam("hourly", "temperature_2m,precipitation_probability,precipitation,wind_speed_10m")
                 .queryParam("timezone", "auto")
                 .toUriString();
 
@@ -151,7 +146,7 @@ public class WeatherService {
     public WeatherResponse getSoilData(double latitude, double longitude) {
         log.info("Fetching soil data for coordinates: lat={}, lon={}", latitude, longitude);
         
-        String url = UriComponentsBuilder.fromHttpUrl("https://api.open-meteo.com/v1/forecast")
+        String url = UriComponentsBuilder.fromUriString("https://api.open-meteo.com/v1/forecast")
                 .queryParam("latitude", latitude)
                 .queryParam("longitude", longitude)
                 .queryParam("hourly", "soil_temperature_0_to_7cm,soil_moisture_0_to_7cm")

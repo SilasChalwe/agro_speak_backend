@@ -30,6 +30,7 @@ public class AgricultureSearchService {
 
         String englishAnswer;
         try {
+            @SuppressWarnings("null")
             OpenRouterResponse response = this.webClient.post()
                     .uri("/chat/completions")
                     .header("Authorization", "Bearer " + openRouterApiKey)

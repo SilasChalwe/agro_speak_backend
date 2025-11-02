@@ -94,6 +94,9 @@ public class WeatherResponse {
         @JsonProperty("weathercode")
         private int[] weathercode;
 
+        @JsonProperty("precipitation")
+        private Double[] precipitation;
+
         @JsonProperty("soil_temperature_0_to_7cm")
         private double[] soilTemperature;
 
