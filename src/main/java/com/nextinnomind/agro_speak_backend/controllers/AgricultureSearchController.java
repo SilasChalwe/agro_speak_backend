@@ -1,4 +1,4 @@
-package com.nextinnomind.agro_speak_backend.controller;
+package com.nextinnomind.agro_speak_backend.controllers;
 
 import com.nextinnomind.agro_speak_backend.service.AgricultureSearchService;
 import com.nextinnomind.agro_speak_backend.dto.SearchRequest;
