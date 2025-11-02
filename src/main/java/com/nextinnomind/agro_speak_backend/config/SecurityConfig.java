@@ -77,6 +77,7 @@ public class SecurityConfig {
                         "/api/v1/weather/**",
                         "/api/translate/**",
                         "/api/search/**",
+                        "/api/v1/ai/**",
                         "/ws/**",
                         // Swagger and API docs
                         "/v3/api-docs/**",
